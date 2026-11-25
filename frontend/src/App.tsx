@@ -27,5 +27,113 @@ export default function App() {
   return <div className="app"><aside><div className="brand">CareerMatch <span>AI</span></div>{["Dashboard", "CVs", "Job offers", "New analysis", "Analyses", "Profile"].map(item => <button className={page === item ? "nav active" : "nav"} onClick={() => setPage(item)} key={item}>{item}</button>)}<button className="nav logout" onClick={() => { localStorage.removeItem("cm_token"); setToken(""); }}>Sign out</button></aside><section className="content"><header><div><p className="eyebrow">WORKSPACE</p><h1>{page}</h1></div><span className="user-chip">{user?.full_name || user?.email}</span></header>{message && <div className="notice">{message}</div>}{page === "Dashboard" && <><div className="cards">{[["CVs", stats?.cv_count ?? 0], ["Job offers", stats?.job_count ?? 0], ["Analyses", stats?.analysis_count ?? 0], ["Average score", stats?.average_score ? `${stats.average_score}%` : "—"]].map(([label, value]) => <article className="card" key={label as string}><span>{label}</span><strong>{value}</strong></article>)}</div><div className="panel"><h2>Recent analyses</h2>{analyses.length ? analyses.map(a => <div className="row" key={a.id}><span>Analysis #{a.id}</span><b>{a.score}%</b></div>) : <p className="muted">Run your first CV analysis to see results here.</p>}</div></>}{page === "CVs" && <><div className="panel"><h2>Upload a CV</h2><form onSubmit={upload} className="form"><input name="cv" type="file" accept="application/pdf" required /><button className="primary">Upload PDF</button></form></div><div className="panel"><h2>Saved CVs</h2>{cvs.length ? cvs.map(cv => <div className="row" key={cv.id}><span><strong>{cv.filename}</strong></span><button className="danger" onClick={() => deleteCv(cv.id)}>Delete</button></div>) : <p className="muted">No CVs yet.</p>}</div></>}{page === "Job offers" && <><div className="panel"><h2>Create a job offer</h2><form onSubmit={createJob} className="form"><input name="title" placeholder="Job title" required /><input name="company" placeholder="Company" /><textarea name="description" placeholder="Paste the job description" minLength={20} required /><button className="primary">Save offer</button></form></div><div className="panel"><h2>Saved job offers</h2>{jobs.length ? jobs.map(job => <div className="row" key={job.id}><span><strong>{job.title}</strong></span><button className="danger" onClick={() => deleteJob(job.id)}>Delete</button></div>) : <p className="muted">No job offers yet.</p>}</div></>}{page === "New analysis" && <div className="panel"><h2>Compare your CV with a job</h2><form onSubmit={createAnalysis} className="form"><select name="cv_id" required><option value="">Select a CV</option>{cvs.map(cv => <option value={cv.id} key={cv.id}>{cv.filename}</option>)}</select><select name="job_offer_id" required><option value="">Select a job offer</option>{jobs.map(job => <option value={job.id} key={job.id}>{job.title}</option>)}</select><button className="primary">Run analysis</button></form></div>}{page === "Analyses" && <div className="panel"><h2>Analysis history</h2>{analyses.map(a => <div className="analysis" key={a.id}><div><strong>Analysis #{a.id}</strong><p>{a.explanation}</p></div><strong className="score">{a.score}%</strong><button className="primary" onClick={() => downloadReport(a.id)}>PDF report</button><button className="danger" onClick={() => deleteAnalysis(a.id)}>Delete</button></div>)}</div>}{page === "Profile" && <div className="panel"><h2>Your profile</h2><p>{user?.full_name}</p><p className="muted">{user?.email}</p></div>}</section></div>;
 }
 
-function Auth({ onLogin }: { onLogin: (token: string, user: User) => void }) { const [register, setRegister] = useState(true); const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [name, setName] = useState(""); const [error, setError] = useState(""); async function submit(e: FormEvent) { e.preventDefault(); const body = register ? JSON.stringify({ email, password, full_name: name }) : new URLSearchParams({ username: email, password }); const r = await fetch(`${API}/auth/${register ? "register" : "login"}`, { method: "POST", headers: register ? { "Content-Type": "application/json" } : { "Content-Type": "application/x-www-form-urlencoded" }, body }); const data = await r.json(); if (!r.ok) return setError(data.detail ?? "Unable to sign in"); onLogin(data.access_token, data.user); } return <main className="auth"><p className="eyebrow">CAREERMATCH AI</p><h1>Make every application count.</h1><form onSubmit={submit} className="auth-card"><div className="tabs"><button type="button" onClick={() => setRegister(true)} className={register ? "active" : ""}>Create account</button><button type="button" onClick={() => setRegister(false)} className={!register ? "active" : ""}>Sign in</button></div>{register && <input placeholder="Full name" value={name} onChange={e => setName(e.target.value)} />}<input type="email" placeholder="Email" required value={email} onChange={e => setEmail(e.target.value)} /><input type="password" placeholder="Password (8+ characters)" minLength={8} required value={password} onChange={e => setPassword(e.target.value)} /><button className="primary">{register ? "Create workspace" : "Sign in"}</button>{error && <p className="error">{error}</p>}</form></main>; }
 
+
+function Auth({ onLogin }: { onLogin: (token: string, user: User) => void }) {
+  const [register, setRegister] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    const body = register
+      ? { email, password, full_name: name }
+      : { email, password };
+
+    try {
+      const response = await fetch(
+        `${API}/auth/${register ? "register" : "login"}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(
+          typeof data.detail === "string"
+            ? data.detail
+            : "Unable to sign in"
+        );
+        return;
+      }
+
+      onLogin(data.access_token, data.user);
+    } catch {
+      setError("Unable to connect to the server.");
+    }
+  }
+
+  return (
+    <main className="auth">
+      <p className="eyebrow">CAREERMATCH AI</p>
+      <h1>Make every application count.</h1>
+
+      <form onSubmit={submit} className="auth-card">
+        <div className="tabs">
+          <button
+            type="button"
+            onClick={() => {
+              setRegister(true);
+              setError("");
+            }}
+            className={register ? "active" : ""}
+          >
+            Create account
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setRegister(false);
+              setError("");
+            }}
+            className={!register ? "active" : ""}
+          >
+            Sign in
+          </button>
+        </div>
+
+        {register && (
+          <input
+            placeholder="Full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        )}
+
+        <input
+          type="email"
+          placeholder="Email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Password (8+ characters)"
+          minLength={8}
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button className="primary">
+          {register ? "Create workspace" : "Sign in"}
+        </button>
+
+        {error && <p className="error">{error}</p>}
+      </form>
+    </main>
+  );
+}

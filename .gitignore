@@ -33,3 +33,5 @@ build/
 # IDE
 .vscode/
 .idea/
+# TypeScript build cache
+*.tsbuildinfo
