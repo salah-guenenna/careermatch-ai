@@ -1,0 +1,35 @@
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Uploaded CVs and private documents
+uploads/
+**/uploads/
+
+# Backups
+backups/
+**/backups/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Node.js
+node_modules/
+dist/
+build/
+
+# Database files
+*.sqlite3
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/

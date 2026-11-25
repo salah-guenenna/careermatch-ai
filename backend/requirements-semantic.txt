@@ -1,0 +1,5 @@
+# Optional semantic matching extension. Requires 64-bit CPython 3.10+.
+# Windows 32-bit (cp310-win32) is not supported because SciPy/PyTorch wheels are unavailable.
+sentence-transformers==3.3.1
+scikit-learn==1.6.1
+
