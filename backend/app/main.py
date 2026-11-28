@@ -8,11 +8,11 @@ from app.api.resources import router as resources_router
 from app.api.analyses import router as analyses_router
 from app.api.dashboard import router as dashboard_router
 from app.core.config import get_settings
-from app.db.session import create_tables
+from app.db.session import create_tables, database_is_reachable
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name, version="0.1.0", description="CareerMatch AI REST API")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", settings.frontend_url], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "api", "*"])
 
 
@@ -35,3 +35,17 @@ app.include_router(dashboard_router)
 def startup() -> None:
     create_tables()
 
+@app.get("/health/ready")
+def health_ready():
+    db_ok = database_is_reachable()
+
+    if not db_ok:
+        return {
+            "status": "not_ready",
+            "database": False
+        }
+
+    return {
+        "status": "ready",
+        "database": True
+    }
