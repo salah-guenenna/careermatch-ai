@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     secret_key: str = "change-me-in-development"
     database_url: str = "sqlite+pysqlite:///./careermatch.sqlite3"
+    frontend_url: str = "http://localhost:5173"
     enable_semantic_matching: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False, extra="ignore")
