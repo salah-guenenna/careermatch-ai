@@ -1,0 +1,26 @@
+@startuml
+title CareerMatch AI - Diagramme de composants
+skinparam componentStyle rectangle
+component "React + TypeScript\nDashboard" as Frontend
+component "FastAPI\nRoutes" as API
+component "Auth service\nJWT + Argon2" as Auth
+component "CV/Job service" as Resources
+component "Analysis service" as Analysis
+component "PDF extractor\nPyMuPDF" as PDF
+component "Matcher\nTF-IDF / cosine" as Matcher
+component "Semantic matcher\noptional" as Semantic
+database "PostgreSQL" as DB
+folder "Private uploads" as Storage
+Frontend --> API : HTTPS/JSON
+API --> Auth
+API --> Resources
+API --> Analysis
+Resources --> PDF
+Resources --> Storage
+Auth --> DB
+Resources --> DB
+Analysis --> Matcher
+Analysis --> Semantic : optional
+Analysis --> DB
+@enduml
+

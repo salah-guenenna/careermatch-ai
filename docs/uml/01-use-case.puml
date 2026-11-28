@@ -1,0 +1,34 @@
+@startuml
+title CareerMatch AI - Diagramme de cas d'utilisation
+left to right direction
+actor "Candidat" as User
+actor "Opérateur\n(infrastructure)" as Ops
+rectangle "CareerMatch AI" {
+  usecase "Créer un compte" as Register
+  usecase "Se connecter" as Login
+  usecase "Gérer le profil" as Profile
+  usecase "Téléverser un CV PDF" as Upload
+  usecase "Gérer les CV" as CVs
+  usecase "Créer une offre" as JobCreate
+  usecase "Gérer les offres" as Jobs
+  usecase "Lancer une analyse" as Analyze
+  usecase "Consulter l'historique" as History
+  usecase "Télécharger un rapport PDF" as Report
+  usecase "Voir les statistiques" as Dashboard
+  usecase "Sauvegarder les données" as Backup
+}
+User --> Register
+User --> Login
+User --> Profile
+User --> CVs
+User --> Jobs
+User --> Analyze
+User --> History
+User --> Report
+User --> Dashboard
+CVs .> Upload : <<include>>
+Analyze .> History : <<include>>
+Analyze .> Report : <<extend>>
+Ops --> Backup
+@enduml
+

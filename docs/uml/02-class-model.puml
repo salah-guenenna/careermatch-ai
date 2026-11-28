@@ -1,0 +1,50 @@
+@startuml
+title CareerMatch AI - Modèle de classes métier
+hide methods
+skinparam classAttributeIconSize 0
+class User {
+  +id: int
+  +email: string
+  +fullName: string
+  +passwordHash: string
+  +isActive: bool
+}
+class CV {
+  +id: int
+  +filename: string
+  +storagePath: string
+  +extractedText: text
+}
+class JobOffer {
+  +id: int
+  +title: string
+  +company: string
+  +description: text
+}
+class Analysis {
+  +id: int
+  +score: float
+  +skillsScore: float
+  +experienceScore: float
+  +educationScore: float
+  +keywordsScore: float
+  +explanation: text
+}
+class MatchDetail {
+  +id: int
+  +skill: string
+  +matched: bool
+}
+class Recommendation {
+  +id: int
+  +text: text
+}
+User "1" o-- "0..*" CV
+User "1" o-- "0..*" JobOffer
+User "1" o-- "0..*" Analysis
+CV "1" <-- "0..*" Analysis
+JobOffer "1" <-- "0..*" Analysis
+Analysis "1" *-- "0..*" MatchDetail
+Analysis "1" *-- "0..*" Recommendation
+@enduml
+

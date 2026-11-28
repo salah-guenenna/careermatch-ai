@@ -1,0 +1,28 @@
+@startuml
+title CareerMatch AI - Diagramme de déploiement
+node "Poste utilisateur" as Client {
+  artifact "Navigateur web" as Browser
+}
+node "Serveur Docker" as Host {
+  node "Frontend container" as Front {
+    artifact "Nginx / Vite" as Static
+  }
+  node "API container" as API {
+    artifact "Uvicorn + FastAPI" as App
+  }
+  node "Database container" as DB {
+    database "PostgreSQL" as PG
+  }
+  node "Reverse proxy" as Proxy {
+    artifact "Caddy HTTPS" as Caddy
+  }
+  folder "Persistent volumes" as Volumes
+}
+Browser --> Caddy : HTTPS
+Caddy --> Static : HTTP
+Caddy --> App : HTTP API
+App --> PG : SQL
+App --> Volumes : CV files
+PG --> Volumes : database volume
+@enduml
+

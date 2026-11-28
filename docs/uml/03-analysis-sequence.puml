@@ -1,0 +1,26 @@
+@startuml
+title CareerMatch AI - Séquence de création d'une analyse
+actor Candidat as User
+participant "React UI" as UI
+participant "FastAPI" as API
+participant "Analysis service" as Service
+participant "Matcher" as Matcher
+database PostgreSQL as DB
+User -> UI: Sélectionne CV et offre
+UI -> API: POST /analyses
+API -> API: Valide JWT et propriété
+API -> DB: Charge CV et JobOffer
+DB --> API: Textes sources
+API -> Service: Demande d'analyse
+Service -> Matcher: analyze(cvText, jobText)
+Matcher -> Matcher: Compétences
+Matcher -> Matcher: TF-IDF + cosine
+Matcher --> Service: Score et recommandations
+Service -> DB: Enregistre Analysis, détails et recommandations
+DB --> Service: Analyse créée
+Service --> API: Résultat
+API --> UI: 201 + JSON
+UI -> API: GET /analyses
+API --> UI: Historique complet
+@enduml
+

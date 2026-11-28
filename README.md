@@ -16,6 +16,8 @@ For a local backend run: `cd backend`, create a Python 3.11 virtual environment,
 
 Verify with `cd backend && pytest`.
 
+UML sources are available in `docs/uml/` as PlantUML files for use-case, class, sequence, component, deployment, and package diagrams.
+
 ## Phase 3 API examples
 
 Register or sign in through Swagger to obtain a bearer token. Then use `POST /cvs/upload` with a multipart PDF and `POST /jobs` with `{ "title": "Backend Engineer", "company": "Example", "description": "..." }`. Uploaded PDFs are limited to 5 MB, stored under `uploads/`, and rejected when they contain no selectable text.

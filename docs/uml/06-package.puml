@@ -1,0 +1,30 @@
+@startuml
+title CareerMatch AI - Diagramme de packages
+package "frontend/src" {
+  [App] as App
+  [api client] as Client
+  [styles] as Styles
+}
+package "backend/app" {
+  package "api" { [auth routes] as AuthRoutes; [resource routes] as ResourceRoutes; [analysis routes] as AnalysisRoutes; [dashboard routes] as DashboardRoutes }
+  package "schemas" { [Pydantic contracts] as Schemas }
+  package "services" { [PDF extractor] as Extractor; [Matcher] as MatchService; [Semantic matcher] as SemanticService }
+  package "db" { [SQLAlchemy models] as Models; [repositories/session] as Repo }
+  package "core" { [configuration] as Config; [security] as Security }
+}
+App --> Client
+Client --> AuthRoutes
+Client --> ResourceRoutes
+Client --> AnalysisRoutes
+Client --> DashboardRoutes
+AuthRoutes --> Security
+AuthRoutes --> Schemas
+ResourceRoutes --> Extractor
+ResourceRoutes --> Repo
+AnalysisRoutes --> MatchService
+AnalysisRoutes --> Repo
+MatchService --> SemanticService
+Repo --> Models
+Config --> Repo
+@enduml
+
